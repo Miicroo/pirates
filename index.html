@@ -1,0 +1,48 @@
+<html>
+	<head>
+		<title>Pirates</title>
+		<!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+		<script type="text/javascript" src="js/rx.js"></script>
+		
+		<script type="text/javascript" src="js/Ship.js"></script>
+		<script type="text/javascript" src="js/GameBoard.js"></script>
+	</head>
+	<body>
+		<div id="content">
+			<table id = "gameBoard">
+
+			</table>
+
+			<script>
+				function drawGrid(grid) {
+					const table = document.querySelector('#gameBoard');
+
+					grid.map(row => createTr(row))
+						.forEach(tr => table.appendChild(tr));
+				}
+
+				function createTr(row) {
+					const tr = document.createElement('tr');
+					row.map(item => {
+						const td = createTd(item);
+						tr.appendChild(td);
+					});
+					return tr;
+				}
+
+				function createTd(item) {
+					const td = document.createElement('td');
+					td.style.width = '30px';
+					td.style.height = '30px';
+					td.innerText = ' ';
+					td.style.backgroundColor = item.color;
+					return td;
+				}
+
+				const gameBoard = new GameBoard();
+				const grid = gameBoard.getGrid();
+				drawGrid(grid);
+			</script>
+		</div>
+	</body>
+</html>
