@@ -5,7 +5,9 @@
 		<script type="text/javascript" src="js/rx.js"></script>
 		
 		<script type="text/javascript" src="js/Ship.js"></script>
+		<script type="text/javascript" src="js/Dice.js"></script>
 		<script type="text/javascript" src="js/GameBoard.js"></script>
+		<script type="text/javascript" src="js/GameController.js"></script>
 	</head>
 	<body>
 		<div id="content">
@@ -14,11 +16,47 @@
 			</table>
 
 			<script>
-				function drawGrid(grid) {
+				function drawGameBoard(gameController) {
 					const table = document.querySelector('#gameBoard');
 
+					const grid = gameController.getGameBoardGrid();
+					drawGrid(grid, table);
+
+					const fleets = gameController.getFleets();
+					drawFleets(fleets, table);
+				}
+
+				function drawFleets(fleets, gameBoard) {
+					fleets.map(fleet => createFleet(fleet))
+						  .forEach(fleet => fleet.forEach(shipObject => {
+						  		const ship = shipObject.ship;
+						  		const element = shipObject.element;
+						  		const row = gameBoard.children[ship.y];
+						  		row.children[ship.x].appendChild(element);
+							})
+						  );
+
+				}
+
+				function createFleet(fleet) {
+					return fleet.map(ship => createShip(ship));
+				}
+
+				function createShip(ship) {
+					const span = document.createElement('div');
+					span.innerHTML = '&nbsp;';
+					span.style.width = '24px';
+      				span.style.height = '24px';
+      				span.style.marginLeft = '3px';
+      				span.style.borderRadius = '12px';
+				    span.style.backgroundColor = ship.color;
+
+				    return {'ship': ship, 'element': span};
+				}
+
+				function drawGrid(grid, gameBoard) {
 					grid.map(row => createTr(row))
-						.forEach(tr => table.appendChild(tr));
+						.forEach(tr => gameBoard.appendChild(tr));
 				}
 
 				function createTr(row) {
@@ -39,9 +77,8 @@
 					return td;
 				}
 
-				const gameBoard = new GameBoard();
-				const grid = gameBoard.getGrid();
-				drawGrid(grid);
+				const gameController = new GameController();
+				drawGameBoard(gameController);
 			</script>
 		</div>
 	</body>
