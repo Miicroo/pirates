@@ -16,6 +16,7 @@
 			</table>
 
 			<script>
+				// https://www.w3.org/TR/custom-elements/
 				function drawGameBoard(gameController) {
 					const table = document.querySelector('#gameBoard');
 
@@ -45,10 +46,7 @@
 				function createShip(ship) {
 					const span = document.createElement('div');
 					span.innerHTML = '&nbsp;';
-					span.style.width = '24px';
-      				span.style.height = '24px';
-      				span.style.marginLeft = '3px';
-      				span.style.borderRadius = '12px';
+					span.classList.add('ship');
 				    span.style.backgroundColor = ship.color;
 
 				    return {'ship': ship, 'element': span};
@@ -70,10 +68,8 @@
 
 				function createTd(item) {
 					const td = document.createElement('td');
-					td.style.width = '30px';
-					td.style.height = '30px';
 					td.innerText = ' ';
-					td.style.backgroundColor = item.color;
+					td.classList.add(item.name);
 					return td;
 				}
 

@@ -8,3 +8,44 @@
   resize: both;
   overflow: auto;
 }
+
+td {
+	width: 30px;
+	height: 30px;
+}
+
+.forrest {
+	background-color: #298B30;
+}
+
+.tundra {
+	background-color: #7E865D;
+}
+
+.desert {
+	background-color: #F3F7B7;
+}
+
+.island {
+	background-color: #CDBF8A;
+}
+
+.water {
+	background-color: #22A6D5;
+}
+
+.passage {
+	background-color: #1D2E97;
+}
+
+.harbour {
+	background-color: #8EDBF7;
+}
+
+.ship {
+	width: 24px;
+	height: 24px;
+	margin-left: 3px;
+	border-radius: 12px;
+}
+

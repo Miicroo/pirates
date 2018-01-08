@@ -6,13 +6,13 @@ class GameBoard {
 	_setUpGrid() {
 		this._grid = [];
 
-		const f = {'color': '#298B30', 'name': 'forrest'};
-		const t = {'color': '#7E865D', 'name': 'tundra'};
-		const d = {'color': '#F3F7B7', 'name': 'desert'};
-		const i = {'color': '#CDBF8A', 'name': 'island'};
-		const w = {'color': '#22A6D5', 'name': 'water'};
-		const p = {'color': '#1D2E97', 'name': 'passage'};
-		const h = {'color': '#8EDBF7', 'name': 'harbour'};
+		const f = {'name': 'forrest', 'passable': false};
+		const t = {'name': 'tundra', 'passable': false};
+		const d = {'name': 'desert', 'passable': false};
+		const i = {'name': 'island', 'passable': false};
+		const w = {'name': 'water'};
+		const p = {'name': 'passage', 'passable': false};
+		const h = {'name': 'harbour'};
 
 		this._grid[0]  = [d,d,d,d,d,w,w,w,w,w,h,d,d,d,d,d,d,d,d,d];
 		this._grid[1]  = [d,d,d,d,d,w,w,d,d,d,d,d,d,d,d,d,d,d,d,d];
