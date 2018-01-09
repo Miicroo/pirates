@@ -40,6 +40,10 @@ td {
 
 .harbour {
 	background-color: #8EDBF7;
+	background-image: url(images/anchor.png);
+	background-size: 16px 16px;
+	background-position: center;
+	background-repeat: no-repeat;
 }
 
 .ship {
