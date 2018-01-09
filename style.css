@@ -12,6 +12,7 @@
 td {
 	width: 30px;
 	height: 30px;
+	padding: 0px;
 }
 
 .forrest {
@@ -24,6 +25,9 @@ td {
 
 .desert {
 	background-color: #F3F7B7;
+	background-image: url(images/sand.jpg);
+	background-position: center;
+	background-repeat: no-repeat;
 }
 
 .island {
@@ -36,6 +40,9 @@ td {
 
 .water {
 	background-color: #22A6D5;
+	background-image: url(images/water.jpg);
+	background-position: center;
+	background-repeat: no-repeat;
 }
 
 .passage {
