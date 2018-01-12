@@ -1,28 +1,31 @@
 class GameController {
 	constructor() {
 		this._gameBoard = new GameBoard();
-		this._createShips();
+		this._players = this._createPlayers();
 	}
 
-	_createShips() {
-		const spain = [{'color': '#ffffff', 'x': 7, 'y': 0},
-					   {'color': '#ffffff', 'x': 8, 'y': 0},
-					   {'color': '#ffffff', 'x': 9, 'y': 0}
-					  ];
-		const arabia = [{'color': '#7E0CCA', 'x': 0, 'y': 7},
-			   			{'color': '#7E0CCA', 'x': 0, 'y': 8},
-			   			{'color': '#7E0CCA', 'x': 0, 'y': 9}
-			  		   ];
-		const france = [{'color': '#088362', 'x': 19, 'y': 10},
-			   			{'color': '#088362', 'x': 19, 'y': 11},
-			   			{'color': '#088362', 'x': 19, 'y': 12}
-			  		   ];
-		const pirates = [{'color': '#000000', 'x': 10, 'y': 19},
-			   			 {'color': '#000000', 'x': 11, 'y': 19},
-			   			 {'color': '#000000', 'x': 12, 'y': 19}
-			  		    ];
+	_createPlayers() {
+		const players = [];
 
-		this._fleets = [spain, arabia, france, pirates];
+		players.push(new Bot('Spain', this._createFleet('#ffffff', 7, 0, x => x+1, y => y)));
+		players.push(new Bot('Arabia', this._createFleet('#7E0CCA', 0, 7, x => x, y => y+1)));
+		players.push(new Bot('France', this._createFleet('#088362', 19, 10, x => x, y => y+1)));
+		players.push(new Human('Pirates', this._createFleet('#000000', 10, 19, x => x+1, y => y)));
+
+		return players;
+	}
+
+	_createFleet(colour, startX, startY, transformX, transformY) {
+		const ships = [];
+		const numberOfShips = 3;
+		let x = startX;
+		let y = startY;
+		for(let i = 0; i< numberOfShips; i++) {
+			ships.push({'color': colour, 'x': x, 'y': y});
+			x = transformX(x);
+			y = transformY(y);
+		}
+		return ships;
 	}
 
 	getGameBoardGrid() {
@@ -30,6 +33,10 @@ class GameController {
 	}
 
 	getFleets() {
-		return this._fleets;
+		return this._players.map(p => p._ships); //TODO oh no dont do this
+	}
+
+	calculateMovingPositions(ships, dices) {
+
 	}
 }

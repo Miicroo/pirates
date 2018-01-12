@@ -10,9 +10,9 @@ class GameBoard {
 		const t = {'name': 'tundra', 'passable': false};
 		const d = {'name': 'desert', 'passable': false};
 		const i = {'name': 'island', 'passable': false};
-		const w = {'name': 'water'};
+		const w = {'name': 'water', 'passable': true};
 		const p = {'name': 'passage', 'passable': false};
-		const h = {'name': 'harbour'};
+		const h = {'name': 'harbour', 'passable': true};
 
 		this._grid[0]  = [d,d,d,d,d,w,w,w,w,w,h,d,d,d,d,d,d,d,d,d];
 		this._grid[1]  = [d,d,d,d,d,w,w,d,d,d,d,d,d,d,d,d,d,d,d,d];
