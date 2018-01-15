@@ -1,7 +1,8 @@
 class Ship {
-	constructor(x, y) {
+	constructor(x, y, color) {
 		this._x = x;
 		this._y = y;
+		this._color = color;
 	}
 
 	getX() {
@@ -18,5 +19,9 @@ class Ship {
 
 	setY(y) {
 		this._y = y;
+	}
+
+	getColor() {
+		return this._color;
 	}
 }

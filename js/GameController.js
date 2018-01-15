@@ -1,18 +1,53 @@
 class GameController {
 	constructor() {
-		this._gameBoard = new GameBoard();
-		this._players = this._createPlayers();
+		this._gameState = new GameState();
 	}
 
-	_createPlayers() {
-		const players = [];
+	getGameBoardGrid() {
+		return this._gameState._gameBoard.getGrid(); // TODO fixme
+	}
 
-		players.push(new Bot('Spain', this._createFleet('#ffffff', 7, 0, x => x+1, y => y)));
-		players.push(new Bot('Arabia', this._createFleet('#7E0CCA', 0, 7, x => x, y => y+1)));
-		players.push(new Bot('France', this._createFleet('#088362', 19, 10, x => x, y => y+1)));
-		players.push(new Human('Pirates', this._createFleet('#000000', 10, 19, x => x+1, y => y)));
+	getUpdateChannel() {
+		return this._gameState._updateChannel; // TODO fixme	
+	}
 
-		return players;
+	start() {
+		const states = this._gameState._playerStates; // FIXME
+		states.forEach(state => {
+			state.getShips().forEach(ship => {
+				getUpdateChannel.onNext({'action': 'shipAdded', 'data': {'player': state.getName(), 'ship': ship}});
+			});
+		});
+	}
+}
+
+class GameState {
+	constuctor() {
+		this._updateChannel = new Rx.Subject();
+		this._gameBoard = new GameBoard();
+		this._playerStates = this._createPlayerStates();
+		this._players = this._createPlayers(this._playerStates, this._updateChannel);
+	}
+
+	_createPlayerStates() {
+		const playerStates = [];
+
+		playerStates.push(new PlayerState('Spain', this._createFleet('#ffffff', 7, 0, x => x+1, y => y), new Rx.Subject(), new Rx.Subject()));
+		playerStates.push(new PlayerState('Arabia', this._createFleet('#7E0CCA', 0, 7, x => x, y => y+1), new Rx.Subject(), new Rx.Subject()));
+		playerStates.push(new PlayerState('France', this._createFleet('#088362', 19, 10, x => x, y => y+1), new Rx.Subject(), new Rx.Subject()));
+		playerStates.push(new PlayerState('Pirates', this._createFleet('#000000', 10, 19, x => x+1, y => y), new Rx.Subject(), new Rx.Subject()));
+
+		return playerStates;
+	}
+
+	_createPlayers(playerStates, updateChannel) {
+		return playerStates.map(state => {
+			if(state.getName() === 'Pirates') {
+				return new Human(state.getName(), state.getShips(), state.getControllerSenderChannel(), state.getPlayerSenderChannel(), updateChannel);
+			} else {
+				return new Bot(state.getName(), state.getShips(), state.getControllerSenderChannel(), state.getPlayerSenderChannel(), updateChannel);
+			}
+		});
 	}
 
 	_createFleet(colour, startX, startY, transformX, transformY) {
@@ -21,22 +56,35 @@ class GameController {
 		let x = startX;
 		let y = startY;
 		for(let i = 0; i< numberOfShips; i++) {
-			ships.push({'color': colour, 'x': x, 'y': y});
+			ships.push(new Ship(x, y, colour));
 			x = transformX(x);
 			y = transformY(y);
 		}
 		return ships;
 	}
+}
 
-	getGameBoardGrid() {
-		return this._gameBoard.getGrid();
+class PlayerState {
+	constructor(name, ships, controllerSenderChannel, playerSenderChannel) {
+		this._name = name;
+		this._ships = ships;
+		this._controllerSenderChannel = controllerSenderChannel;
+		this._playerSenderChannel = playerSenderChannel;
 	}
 
-	getFleets() {
-		return this._players.map(p => p._ships); //TODO oh no dont do this
+	getName() {
+		return this._name;
 	}
 
-	calculateMovingPositions(ships, dices) {
+	getShips() {
+		return this._ships;
+	}
 
+	getControllerSenderChannel() {
+		return this._controllerSenderChannel;
+	}
+
+	getPlayerSenderChannel() {
+		return this._playerSenderChannel;
 	}
 }
