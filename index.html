@@ -25,34 +25,6 @@
 
 					const grid = gameController.getGameBoardGrid();
 					drawGrid(grid, table);
-
-					const fleets = gameController.getFleets();
-					drawFleets(fleets, table);
-				}
-
-				function drawFleets(fleets, gameBoard) {
-					fleets.map(fleet => createFleet(fleet))
-						  .forEach(fleet => fleet.forEach(shipObject => {
-						  		const ship = shipObject.ship;
-						  		const element = shipObject.element;
-						  		const row = gameBoard.children[ship.y];
-						  		row.children[ship.x].appendChild(element);
-							})
-						  );
-
-				}
-
-				function createFleet(fleet) {
-					return fleet.map(ship => createShip(ship));
-				}
-
-				function createShip(ship) {
-					const span = document.createElement('div');
-					span.innerHTML = '&nbsp;';
-					span.classList.add('ship');
-				    span.style.backgroundColor = ship.color;
-
-				    return {'ship': ship, 'element': span};
 				}
 
 				function drawGrid(grid, gameBoard) {
@@ -78,6 +50,10 @@
 
 				const gameController = new GameController();
 				drawGameBoard(gameController);
+
+				const uiController = new UIController('#gameBoard', gameController.getUpdateChannel());
+
+				gameController.start();
 			</script>
 		</div>
 	</body>

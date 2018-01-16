@@ -4,25 +4,25 @@ class GameController {
 	}
 
 	getGameBoardGrid() {
-		return this._gameState._gameBoard.getGrid(); // TODO fixme
+		return this._gameState.getGameBoard().getGrid();
 	}
 
 	getUpdateChannel() {
-		return this._gameState._updateChannel; // TODO fixme	
+		return this._gameState.getUpdateChannel();	
 	}
 
 	start() {
 		const states = this._gameState._playerStates; // FIXME
 		states.forEach(state => {
 			state.getShips().forEach(ship => {
-				getUpdateChannel.onNext({'action': 'shipAdded', 'data': {'player': state.getName(), 'ship': ship}});
+				this.getUpdateChannel().onNext({'action': 'shipAdded', 'data': {'player': state.getName(), 'ship': ship}});
 			});
 		});
 	}
 }
 
 class GameState {
-	constuctor() {
+	constructor() {
 		this._updateChannel = new Rx.Subject();
 		this._gameBoard = new GameBoard();
 		this._playerStates = this._createPlayerStates();
@@ -61,6 +61,18 @@ class GameState {
 			y = transformY(y);
 		}
 		return ships;
+	}
+
+	getUpdateChannel() {
+		return this._updateChannel;
+	}
+
+	getGameBoard() {
+		return this._gameBoard;
+	}
+
+	getPlayers() {
+		return this._players;
 	}
 }
 

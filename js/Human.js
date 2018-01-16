@@ -1,5 +1,5 @@
 class Human {
-	constructor(teamName, ships, inputChannel, outChannel, updateChannel) {
+	constructor(teamName, ships, inputChannel, outputChannel, updateChannel) {
 		this._name = teamName;
 		this._ships = ships;
 		this._inputChannel = inputChannel;
