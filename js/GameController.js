@@ -1,6 +1,11 @@
 class GameController {
 	constructor() {
 		this._gameState = new GameState();
+		this._currentPlayerIndex = this._getStartingPlayerIndex();
+	}
+
+	_getStartingPlayerIndex() {
+		return 3;
 	}
 
 	getGameBoardGrid() {
@@ -12,6 +17,20 @@ class GameController {
 	}
 
 	start() {
+		this._broadcastInitialShips();
+	}
+
+	_playRound() {
+		// Roll 2 dice
+		// Calculate possible positions for _currentPlayerIndex
+		// Send updates to _currentPlayerIndex
+		// Wait for _currentPlayerIndex
+		// Evaluate move
+		// Send updates to everyone
+		// Calculate next _currentPlayerIndex
+	}
+
+	_broadcastInitialShips() {
 		const states = this._gameState._playerStates; // FIXME
 		states.forEach(state => {
 			state.getShips().forEach(ship => {
