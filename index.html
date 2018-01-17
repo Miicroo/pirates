@@ -15,7 +15,7 @@
 	</head>
 	<body>
 		<div id="content">
-			<table id = "gameBoard">
+			<table id = "gameBoards">
 			</table>
 
 			<script>
@@ -49,9 +49,9 @@
 				}
 
 				const gameController = new GameController();
-				drawGameBoard(gameController);
+				//drawGameBoard(gameController);
 
-				const uiController = new UIController('#gameBoard', gameController.getUpdateChannel());
+				//const uiController = new UIController('#gameBoard', gameController.getUpdateChannel());
 
 				gameController.start();
 			</script>

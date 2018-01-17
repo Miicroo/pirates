@@ -18,11 +18,18 @@ class GameController {
 
 	start() {
 		this._broadcastInitialShips();
+		this._playRound();
 	}
 
 	_playRound() {
 		// Roll 2 dice
+		const dice = [Dice.roll(), Dice.roll()];
+		console.log(dice);
+
 		// Calculate possible positions for _currentPlayerIndex
+		const state = this._gameState.getPlayerStates()[this._currentPlayerIndex];
+		const ships = state.getShips();
+		const possiblePositions = this._getPossiblePositions(ships, dice);
 		// Send updates to _currentPlayerIndex
 		// Wait for _currentPlayerIndex
 		// Evaluate move
@@ -30,8 +37,45 @@ class GameController {
 		// Calculate next _currentPlayerIndex
 	}
 
+	_getPossiblePositions(ships, dice) {
+		// Try first die, then second die
+		const directions = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
+		const d1Directions = directions.map(d => ships.map(ship => this._getPositionsForDie(ship, dice[0], d)));
+		console.log(d1Directions);
+		// ships.map(ship => )
+	}
+
+	_getPositionsForDie(ship, die, direction) {
+		const retVal = [];
+		let func = undefined;
+		if(direction === 'UP') {
+			func = (x, y) => { return {'x':x,'y':y-1};};
+		} else if(direction === 'DOWN') {
+			func = (x, y) => { return {'x':x,'y':y+1};};
+		} else if(direction === 'LEFT') {
+			func = (x, y) => { return {'x':x-1,'y':y};};
+		} else if(direction === 'RIGHT') {
+			func = (x, y) => { return {'x':x+1,'y':y};};
+		}
+		let x = ship.getX();
+		let y = ship.getY();
+		for(let i = 0; i<die; i++) {
+			const xyObj = func(x, y);
+			retVal.push(xyObj);
+			x = xyObj.x;
+			y = xyObj.y;
+		}
+
+		return retVal;
+	}
+	_canTravelOnAll(gridPositions) {
+		// TODO dont forget ships
+		return gridPositions.map(position => getGameBoardGrid()[position.y][position.x])
+				.every(node => node.passable);
+	}
+
 	_broadcastInitialShips() {
-		const states = this._gameState._playerStates; // FIXME
+		const states = this._gameState.getPlayerStates();
 		states.forEach(state => {
 			state.getShips().forEach(ship => {
 				this.getUpdateChannel().onNext({'action': 'shipAdded', 'data': {'player': state.getName(), 'ship': ship}});
@@ -92,6 +136,10 @@ class GameState {
 
 	getPlayers() {
 		return this._players;
+	}
+
+	getPlayerStates() {
+		return this._playerStates;
 	}
 }
 
