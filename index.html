@@ -1,12 +1,13 @@
 <html>
 	<head>
-		<title>Pirates</title>
+		<!-- <title>Pirates</title> -->
 		<link rel="stylesheet" type="text/css" href="style.css">
 		<script type="text/javascript" src="js/rx.js"></script>
 		
 		<script type="text/javascript" src="js/Ship.js"></script>
 		<script type="text/javascript" src="js/Dice.js"></script>
 		<script type="text/javascript" src="js/GameBoard.js"></script>
+		<script type="text/javascript" src="js/GameBoardWithShips.js"></script>
 		<script type="text/javascript" src="js/GameController.js"></script>
 		<script type="text/javascript" src="js/Human.js"></script>
 		<script type="text/javascript" src="js/Bot.js"></script>
@@ -15,7 +16,7 @@
 	</head>
 	<body>
 		<div id="content">
-			<table id = "gameBoards">
+			<table id = "gameBoard">
 			</table>
 
 			<script>
@@ -49,9 +50,9 @@
 				}
 
 				const gameController = new GameController();
-				//drawGameBoard(gameController);
+				drawGameBoard(gameController);
 
-				//const uiController = new UIController('#gameBoard', gameController.getUpdateChannel());
+				const uiController = new UIController('#gameBoard', gameController.getUpdateChannel());
 
 				gameController.start();
 			</script>

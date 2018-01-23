@@ -2,6 +2,7 @@ class GameController {
 	constructor() {
 		this._gameState = new GameState();
 		this._currentPlayerIndex = this._getStartingPlayerIndex();
+		this._currentSubscription = undefined;
 	}
 
 	_getStartingPlayerIndex() {
@@ -24,54 +25,134 @@ class GameController {
 	_playRound() {
 		// Roll 2 dice
 		const dice = [Dice.roll(), Dice.roll()];
-		console.log(dice);
 
 		// Calculate possible positions for _currentPlayerIndex
 		const state = this._gameState.getPlayerStates()[this._currentPlayerIndex];
 		const ships = state.getShips();
-		const possiblePositions = this._getPossiblePositions(ships, dice);
-		// Send updates to _currentPlayerIndex
-		// Wait for _currentPlayerIndex
+		const possiblePositions = this._getPossiblePositions(ships, dice)
+									  .concat(this._getPossiblePositions(ships, [dice[1], dice[0]]));
+
+		if(possiblePositions.length > 0) {
+			// Set up listener for _currentPlayerIndex
+			this._currentSubscription = state.getPlayerSenderChannel().subscribe(data => this._getInputFromUser(data));
+			// Send updates to _currentPlayerIndex
+			state.getControllerSenderChannel().onNext(possiblePositions);
+		} else {
+			this._nextRound();
+		}
+	}
+
+	_getInputFromUser(data) {
+		console.log(data);
+		this._currentSubscription.dispose();
+
+		const firstMove = data[0];
+		const secondMove = data[1];
+
 		// Evaluate move
-		// Send updates to everyone
+		this._move(firstMove);
+		this._move(secondMove);
+
+		// TODO check conditions
 		// Calculate next _currentPlayerIndex
+		this._nextRound();
+	}
+
+	_move(move) {
+		const playerState = this._gameState.getPlayerStates()[this._currentPlayerIndex];
+		const ships = playerState.getShips();
+
+		const newShips = ships.map(ship => {
+			if(ship.getX() === move.from.x && ship.getY() === move.from.y) {
+				return new Ship(move.to.x, move.to.y, ship.getColor());
+			} else {
+				return ship;
+			}
+		});
+		playerState.setShips(newShips);
+
+		// Send updates to everyone
+		this.getUpdateChannel().onNext({'action': 'shipMoved',
+										'data': {
+													'player': playerState.getName(),
+													'ship': {
+														'from': new Ship(move.from.x, move.from.y, ships[0].getColor()),
+														'to': new Ship(move.to.x, move.to.y, ships[0].getColor())
+													}
+												}
+										}
+									);
+	}
+
+	_nextRound() {
+		this._currentPlayerIndex = (this._currentPlayerIndex + 1) % (this._gameState.getPlayers().length);
+		this._playRound();
 	}
 
 	_getPossiblePositions(ships, dice) {
 		// Try first die, then second die
 		const directions = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
-		const d1Directions = directions.map(d => ships.map(ship => this._getPositionsForDie(ship, dice[0], d)));
-		console.log(d1Directions);
-		// ships.map(ship => )
+		const d1Directions = directions.map(dir => ships.map(ship => this._getPositionsForDie(ship, dice[0], dir)))
+										.reduce((a,b) => a.concat(b), [])
+										.filter(path => this._canTravelOnAll(path, new GameBoardWithShips(this.getGameBoardGrid(), ships)));
+		const allMoves = d1Directions.map(newDirArray => {
+				return {'from': newDirArray[0], 'to': newDirArray[newDirArray.length-1]};
+			}).map(move => {
+				const newShipPositions = ships.map(ship => {
+					if(ship.getX() == move.from.x && ship.getY() == move.from.y) {
+						return new Ship(move.to.x, move.to.y, ship.getColor());
+					} else {
+						return ship;
+					}
+				}); // All your ships (with those that have moved set on their new position)
+
+				return newShipPositions.map(ship => {
+					return directions.map(dir => this._getPositionsForDie(ship, dice[1], dir))
+								.filter(path => this._canTravelOnAll(path, new GameBoardWithShips(this.getGameBoardGrid(), newShipPositions)))
+								.map(newDirArray => {
+									return [move, {'from': newDirArray[0], 'to': newDirArray[newDirArray.length-1]}];
+								});
+				}).reduce((a,b) => a.concat(b), []);
+		}).reduce((a,b) => a.concat(b), []);
+		
+		return allMoves;
 	}
 
 	_getPositionsForDie(ship, die, direction) {
 		const retVal = [];
 		let func = undefined;
 		if(direction === 'UP') {
-			func = (x, y) => { return {'x':x,'y':y-1};};
+			func = (xy) => { return {'x':xy.x,'y':xy.y-1};};
 		} else if(direction === 'DOWN') {
-			func = (x, y) => { return {'x':x,'y':y+1};};
+			func = (xy) => { return {'x':xy.x,'y':xy.y+1};};
 		} else if(direction === 'LEFT') {
-			func = (x, y) => { return {'x':x-1,'y':y};};
+			func = (xy) => { return {'x':xy.x-1,'y':xy.y};};
 		} else if(direction === 'RIGHT') {
-			func = (x, y) => { return {'x':x+1,'y':y};};
+			func = (xy) => { return {'x':xy.x+1,'y':xy.y};};
 		}
-		let x = ship.getX();
-		let y = ship.getY();
+
+		let xy = {'x':ship.getX(), 'y':ship.getY()};
+		retVal.push(xy);
+
 		for(let i = 0; i<die; i++) {
-			const xyObj = func(x, y);
-			retVal.push(xyObj);
-			x = xyObj.x;
-			y = xyObj.y;
+			xy = func(xy);
+			retVal.push(xy);
 		}
 
 		return retVal;
 	}
-	_canTravelOnAll(gridPositions) {
-		// TODO dont forget ships
-		return gridPositions.map(position => getGameBoardGrid()[position.y][position.x])
+
+	_canTravelOnAll(gridPositions, gameBoard) {
+		return gridPositions.slice(1, gridPositions.length)
+				.map(position => this._getPositionOnGrid(position, gameBoard.getGrid()))
 				.every(node => node.passable);
+	}
+
+	_getPositionOnGrid(position, grid) {
+		return grid[position.y] ? 
+					(grid[position.y][position.x] ?	grid[position.y][position.x] : {'passable': false})
+					:
+					{'passable': false};
 	}
 
 	_broadcastInitialShips() {
@@ -165,5 +246,9 @@ class PlayerState {
 
 	getPlayerSenderChannel() {
 		return this._playerSenderChannel;
+	}
+
+	setShips(ships) {
+		this._ships = ships;
 	}
 }

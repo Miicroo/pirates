@@ -10,7 +10,6 @@ class UIController {
 	}
 
 	_shipAdded(data) {
-		console.log(data);
   		const ship = data.ship;
   		const element = this._createShipUI(ship);
   		const node = this._findShipNode(ship);
@@ -20,12 +19,12 @@ class UIController {
 	_shipRemoved(data) {
   		const ship = data.ship;
   		const node = this._findShipNode(ship);
-  		node.removeChild(node.firstChild);
+  		node.removeChild(node.lastChild);
 	}
 
 	_shipMoved(data) {
-		const removeData = {'data': {'ship': data.ship.from}};
-		const addData = {'data': {'ship': data.ship.to}};
+		const removeData = {'ship': data.ship.from};
+		const addData = {'ship': data.ship.to};
 
 		this._shipRemoved(removeData);
 		this._shipAdded(addData);
