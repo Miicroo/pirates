@@ -10,7 +10,7 @@ class Human {
 	}
 
 	_play(possiblePositions) {
-		console.log('Human got possible positions:');
+		console.log(`${this._name} got possible positions:`);
 		console.log(possiblePositions);
 		this._outputChannel.onNext(possiblePositions[0]);
 	}

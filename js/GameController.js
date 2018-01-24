@@ -3,6 +3,7 @@ class GameController {
 		this._gameState = new GameState();
 		this._currentPlayerIndex = this._getStartingPlayerIndex();
 		this._currentSubscription = undefined;
+		this._rounds = 0;
 	}
 
 	_getStartingPlayerIndex() {
@@ -23,6 +24,11 @@ class GameController {
 	}
 
 	_playRound() {
+		this._rounds++;
+
+		if(this._rounds > 50) {
+			return;
+		}
 		// Roll 2 dice
 		const dice = [Dice.roll(), Dice.roll()];
 
@@ -38,6 +44,7 @@ class GameController {
 			// Send updates to _currentPlayerIndex
 			state.getControllerSenderChannel().onNext(possiblePositions);
 		} else {
+			console.log(`No positions for ${state.getName()} with dice ${dice}`);
 			this._nextRound();
 		}
 	}
@@ -86,7 +93,8 @@ class GameController {
 
 	_nextRound() {
 		this._currentPlayerIndex = (this._currentPlayerIndex + 1) % (this._gameState.getPlayers().length);
-		this._playRound();
+		window.c = this;
+		setTimeout(function() {window.c._playRound()}, 1000);
 	}
 
 	_getPossiblePositions(ships, dice) {
