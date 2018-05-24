@@ -151,6 +151,7 @@ class GameController {
 	}
 
 	_canTravelOnAll(gridPositions, gameBoard) {
+				.map(position => this._getPositionOnGrid(position, gameBoard.getGrid())));
 		return gridPositions.slice(1, gridPositions.length)
 				.map(position => this._getPositionOnGrid(position, gameBoard.getGrid()))
 				.every(node => node.passable);
